@@ -1,20 +1,36 @@
-
 const createError = require('http-errors');
 const express = require('express');
 const engine = require('ejs-mate');
 const path = require('path');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const logger = require('morgan');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const User = require('./models/user');
+const session = require('express-session');
+const mongoose = require('mongoose');
 
-// routes variables
-const indexRouter   = require('./routes/index');
-const postsRouter   = require('./routes/posts');
+// require routes
+const indexRouter = require('./routes/index');
+const postsRouter = require('./routes/posts');
 const reviewsRouter = require('./routes/reviews');
 const testAPIRouter = require('./routes/testAPI');
 
 const app = express();
+
+// connect to the database
+mongoose
+	.connect(
+		'mongodb+srv://fedeemilo:gracias2020@cluster0-9zuxs.mongodb.net/fiaWinedb?retryWrites=true&w=majority',
+		{ useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }
+	)
+	.then(() => {
+		console.log('Connected to DB!');
+	})
+	.catch((err) => {
+		console.log('ERROR: ', err.message);
+	});
 
 // use ejs-locals for all ejs templates
 app.engine('ejs', engine);
@@ -24,12 +40,28 @@ app.set('view engine', 'ejs');
 
 app.use(cors());
 app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// require routes
+// Configure passport and sessions
+app.use(
+	session({
+		secret: 'hang ten dude!',
+		resave: false,
+		saveUninitialized: true
+	})
+);
+
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+// Mount routes
 app.use('/', indexRouter);
 app.use('/posts', postsRouter);
 app.use('/posts/:id/reviews', reviewsRouter);
