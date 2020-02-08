@@ -9,6 +9,7 @@ const logger = require('morgan');
 const cors = require('cors');
 
 const indexRouter = require('./routes/index');
+const postsRouter = require('./routes/posts');
 const usersRouter = require('./routes/users');
 const testAPIRouter = require('./routes/testAPI');
 
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // require routes
 app.use('/', indexRouter);
+app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
 app.use('/testAPI', testAPIRouter);
 
