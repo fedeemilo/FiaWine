@@ -8,9 +8,11 @@ const bodyParser = require('body-parser');
 const logger = require('morgan');
 const cors = require('cors');
 
-const indexRouter = require('./routes/index');
-const postsRouter = require('./routes/posts');
-const usersRouter = require('./routes/users');
+// routes variables
+const indexRouter   = require('./routes/index');
+const postsRouter   = require('./routes/posts');
+const reviewsRouter = require('./routes/reviews');
+const usersRouter   = require('./routes/users');
 const testAPIRouter = require('./routes/testAPI');
 
 const app = express();
@@ -31,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // require routes
 app.use('/', indexRouter);
 app.use('/posts', postsRouter);
+app.use('/posts/:id/reviews', reviewsRouter);
 app.use('/users', usersRouter);
 app.use('/testAPI', testAPIRouter);
 
